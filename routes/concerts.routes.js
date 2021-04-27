@@ -8,7 +8,7 @@ router.route('/concerts').get((req, res) => {
 });
 
 router.route('/concerts/:id').get((req, res) => {
-    const item = db.concerts.find(item => item.id == req.params.id);
+    const item = db.concerts.find(item => item.id === req.params.id);
     if (item) res.json(item);
     else res.status(404).json({ message: 'Not found...' });
 });
@@ -28,7 +28,7 @@ router.route('/concerts').post((req, res) => {
 
   router.route('/concerts/:id').delete((req, res) => {
     db.concerts.forEach(concert => {
-      if(concert.id && concert.id == req.params.id) {
+      if(concert.id && concert.id === req.params.id) {
         const index = db.concerts.indexOf(concert);
         db.concerts.splice(index, 1);
         return res.json(db.concerts);
@@ -39,12 +39,12 @@ router.route('/concerts').post((req, res) => {
   
 router.route('/concerts/:id').put((req, res) => {
     db.concerts.forEach(concert => {
-      if(concert.id && concert.id == req.params.id) {
-        concert.performer = req.body.performer,
-        concert.genre = req.body.genre,
-        concert.price = req.body.price,
-        concert.day = req.body.day,
-        concert.image = req.body.image
+      if(concert.id && concert.id === req.params.id) {
+        concert.performer = req.body.performer;
+        concert.genre = req.body.genre;
+        concert.price = req.body.price;
+        concert.day = req.body.day;
+        concert.image = req.body.image;
         return res.json(db.concerts);
       }
     });
