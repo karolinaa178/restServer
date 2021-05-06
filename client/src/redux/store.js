@@ -11,6 +11,7 @@ const rootReducer = combineReducers({
   seats,
 });
 
+
 const store = createStore(
   rootReducer,
   compose(
