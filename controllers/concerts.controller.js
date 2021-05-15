@@ -53,7 +53,7 @@ exports.delete = async (req, res) => {
         const con = await (Concert.findById(req.params.id));
         if (con) {
             await con.remove();
-            res.json(con);
+            res.json(on);
         }
         else res.status(404).json({ message: 'Not found...' });
     }
