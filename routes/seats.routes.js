@@ -1,57 +1,15 @@
 const express = require('express');
 const router =express.Router();
-const db = require('../db');
-const { v4: uuidv4 } = require('uuid');
+const SeatController = require('../controllers/seats.controller');
 
-router.route('/seats').get((req, res) => {
-    res.json(db.seats);
-});
+router.route('/seats').get(SeatController.getAll);
   
-router.route('/seats/:id').get((req, res) => {
-    const item = db.seats.find(seat => seat.id === req.params.id);
-    if(item) res.json(item);
-    else res.status(404).json({ message: 'Not found...' });
-});
+router.route('/seats/:id').get(SeatController.getById);
   
-router.route('/seats').post((req, res) => {
-    const seat ={
-        id: uuidv4(),
-        day: req.body.day,
-        seat: req.body.seat,
-        client: req.body.client,
-        email: req.body.email
-    };
-    if(db.seats.some(chosenSeat => (chosenSeat.day == req.body.day && chosenSeat.seat == req.body.seat))) {
-      return res.status(404).json({message: 'This seat is taken'});
-    } else {
-      db.seats.push(seat);
-      req.io.emit('seatsUpdated', db.seats);
-      return res.json(db.seats);
-    }
-});
+router.route('/seats').post(SeatController.post);
   
-router.route('/seats/:id').delete((req, res) => {
-    db.seats.forEach(seat => {
-      if(seat.id && seat.id === req.params.id) {
-        const index = db.seats.indexOf(seat);
-        db.seats.splice(index, 1);
-        return res.json(db.seats);
-      }
-    });
-    res.status(404).json({ message: 'Not found...' })
-});
+router.route('/seats/:id').delete(SeatController.delete);
   
-router.route('/seats/:id').put((req, res) => {
-    db.seats.forEach(seat => {
-      if(seat.id && seat.id === req.params.id) {
-        seat.day = req.body.day;
-        seat.seat = req.body.seat;
-        seat.client = req.body.client;
-        seat.email = req.body.email;
-        return res.json(db.seats);
-      }
-    });
-    res.status(404).json({ message: 'Not found...' });
-});
+router.route('/seats/:id').put(SeatController.put);
 
 module.exports = router;
