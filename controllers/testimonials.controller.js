@@ -1,76 +1,63 @@
+const sanitize = require('mongo-sanitize');
 const Testimonial = require('../models/testimonial.model');
 
 exports.getAll = async (req, res) => {
-    try {
-        res.json(await Testimonial.find());
-    }
-    catch (err) {
-        res.status(500).json({message: err});
-    }
-};
-
-exports.getRandom = async (req, res) => {
-    try {
-        const count = await Testimonial.countDocuments();
-        const rand = Math.floor(Math.random() * count);
-        const t = await Testimonial.findOne().skip(rand);
-        if (!t) res.status(404).json({ message: 'Not found' });
-        else res.json(t);
-    }
-    catch (err) {
-        res.status(500).json({ message: err });
-    }
+  try {
+    res.json(await Testimonial.find());
+  }
+  catch(err) {
+    res.status(500).json({ message: err });
+  }
 };
 
 exports.getById = async (req, res) => {
-    try {
-        const t = await Testimonial.findById(req.params.id);
-        if (!t) res.status(404).json({ message: 'Not found' });
-        else res.json(t);
-    }
-    catch (err) {
-        res.status(500).json({message: err});
-    }
+  try {
+    const dep = await Testimonial.findById(req.params.id);
+    if(!dep) res.status(404).json({ message: 'Not found...' });
+    else res.json(dep);
+  }
+  catch(err) {
+    res.status(500).json({ message: err });
+  }
 };
 
-exports.post = async (req, res) => {
+exports.postTestimonial = async (req, res) => {
+  try {
+    const author = sanitize(req.body.author);
+    const text = sanitize(req.body.text);
+    const newTestimonial = new Testimonial({ author, text });
+    await newTestimonial.save();
+    res.json({ message: 'Ok' });
+  } catch(err) {
+    res.status(500).json({ message: err });
+  }
+};
+
+exports.deleteTestimonial = async (req, res) => {
+  try {
+    const dep = await Testimonial.findById(req.params.id);
+    if(dep) {
+      await Testimonial.deleteOne({ _id: req.params.id });
+      res.json(dep);
+    }
+    else res.status(404).json({ message: 'Not found...' });
+  }
+  catch(err) {
+    res.status(500).json({ message: err });
+  }
+};
+
+exports.putTestimonial = async (req, res) => {
+  try {
     const { author, text } = req.body;
-    try {
-        const newTestimonial = new Testimonial({ author, text });
-        await newTestimonial.save();
-        res.json({ message: 'OK' });
+    const dep = await Testimonial.findById(req.params.id);
+    if(dep) {
+      dep.author = author;
+      dep.text = text;
     }
-    catch (err) {
-        res.status(500).json({message: err});
-    }
-};
-
-exports.put = async (req, res) => {
-    const { author, text } = req.body;
-    try {
-        const t = await (Testimonial.findById(req.params.id));
-        if (t) {
-            Object.assign(t, {author, text});
-            const newTestimonial = await t.save();
-            res.json(newTestimonal);
-        }
-        else res.status(404).json({ message: 'Not found...' });
-    }
-    catch (err) {
-        res.status(500).json({message: err});
-    }
-};
-
-exports.delete = async (req, res) => {
-    try {
-        const t = await (Testimonial.findById(req.params.id));
-        if (t) {
-            await t.remove();
-            res.json(con);
-        }
-        else res.status(404).json({ message: 'Not found...' });
-    }
-    catch (err) {
-        res.status(500).json({message: err});
-    }
+    else res.status(404).json({ message: 'Not found...' });
+  }
+  catch(err) {
+    res.status(500).json({ message: err });
+  }
 };
